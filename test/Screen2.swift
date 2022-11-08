@@ -11,6 +11,12 @@ import PhotosUI
 class Screen2: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var imageView: UIImageView!
+ 
+    @IBOutlet weak var textView: UITextView!
+    
+    @IBOutlet var scrollView: UIView!
+    
+    @IBOutlet weak var contentView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
