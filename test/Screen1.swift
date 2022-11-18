@@ -83,7 +83,6 @@ class Screen1: UIViewController ,UITableViewDelegate, UITableViewDataSource {
      
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "Screen2Id") as! Screen2
     
-            
         self.present(vc, animated: true)
     
         // セルの選択を解除

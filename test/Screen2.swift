@@ -10,37 +10,40 @@ import PhotosUI
 
 class Screen2: UIViewController, PHPickerViewControllerDelegate {
 
-    @IBOutlet weak var imageView: UIImageView!
+    var imageView: UIImageView!
  
     @IBOutlet weak var textView: UITextView!
     
-    @IBOutlet var scrollView: UIView!
+    @IBOutlet var scrollView: UIScrollView!
     
     @IBOutlet weak var contentView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action:#selector(tapped)))
         // Do any additional setup after loading the view.
+        initImageView()
+        
+        //スクロールできるサイズをcontentViewの幅と高さに設定
+        scrollView.contentSize = contentView.bounds.size
         
     }
     
-    @objc
-    func tapped() {
+    //イメージビューをタッチしたら、選択画面が飛び出てくる
+    @objc func onTouchImageView(_ sender: UITapGestureRecognizer) {
+        if sender.state == .ended{
+            
+            var configuration = PHPickerConfiguration()
+            configuration.selectionLimit = 1 // 選択数
+            configuration.filter = .images // 写真のみ
+            configuration.preferredAssetRepresentationMode = .current // これがないとJPEGが選択できなかった
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = self
         
-        var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 1 // 選択数
-        configuration.filter = .images // 写真のみ
-        configuration.preferredAssetRepresentationMode = .current // これがないとJPEGが選択できなかった
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = self
-        
-        present(picker, animated: true)
+            present(picker, animated: true)
+        }
     }
     
-    
+    //onTouchImageViewがされた後に、画像を選択した時の処理
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         //写真が選択された後の処理
         for result in results {
@@ -53,7 +56,7 @@ class Screen2: UIViewController, PHPickerViewControllerDelegate {
                         guard let imageData = try? Data(contentsOf: url) else {
                             return
                         }
-
+                        //イメージビューの画像を更新
                         DispatchQueue.main.async {
                             self.imageView.image = UIImage(data: imageData)
                         }
@@ -75,7 +78,32 @@ class Screen2: UIViewController, PHPickerViewControllerDelegate {
         }
         picker.dismiss(animated: true)
     }
+    
+    private func initImageView(){
+        // UIImage インスタンスの生成
+        let image1:UIImage = UIImage(named:"imagecat")!
+        
+        // UIImageView 初期化
+        self.imageView = UIImageView(image:image1)
+        self.imageView.isUserInteractionEnabled = true
+        // スクリーンの縦横サイズを取得
+        let screenWidth:CGFloat = view.frame.size.width
+        let screenHeight:CGFloat = view.frame.size.height
+        
+        //配置する画像の位置を設定
+        let rect:CGRect =
+            CGRect(x:0, y:0, width:screenWidth, height:screenHeight/2)
+        
+        // ImageView frame をCGRectで作った矩形に合わせる
+        imageView.frame = rect;
+        
+        // UIImageViewのインスタンスをビューに追加
+        self.scrollView.addSubview(imageView)
+        
+        //タップした時に画像を選択させる
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTouchImageView(_:))))
 
+    }
 }
 
 
